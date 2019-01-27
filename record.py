@@ -5,6 +5,8 @@ import os
 from matplotlib import pyplot
 from matplotlib import dates
 
+os.chdir('/home/{}/measurenet'.format(os.environ.get('USER')))
+
 conf_ping_json = open('./ping.json', 'r')
 conf_ping = json.load(conf_ping_json)
 
@@ -62,19 +64,17 @@ def Plot(host):
 with open('host.conf', 'r') as f:
     hosts = [host.strip() for host in f]
 
-while True:
+for host in hosts:
 
-    for host in hosts:
+    text = Ping(host)
+    Mbps = Parse(text)
 
-        text = Ping(host)
-        Mbps = Parse(text)
+    if not os.path.isdir('data/' + host):
+        os.makedirs('data/' + host)
 
-        if not os.path.isdir('data/' + host):
-            os.makedirs('data/' + host)
+    now = datetime.now().strftime('%Y%m%d%H%M%S')
 
-        now = datetime.now().strftime('%Y%m%d%H%M%S')
+    with open('data/{}/{}.log'.format(host, now[:8]), 'a') as f:
+        f.write('{} {}\n'.format(now, Mbps))
 
-        with open('data/{}/{}.log'.format(host, now[:8]), 'a') as f:
-            f.write('{} {}\n'.format(now, Mbps))
-
-        Plot(host)
+    Plot(host)
