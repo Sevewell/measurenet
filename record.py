@@ -5,10 +5,11 @@ import os
 from matplotlib import pyplot
 from matplotlib import dates
 
-os.chdir('/home/{}/measurenet'.format(os.environ.get('USER')))
+os.chdir('measurenet')
 
 conf_ping_json = open('./ping.json', 'r')
 conf_ping = json.load(conf_ping_json)
+conf_ping_json.close()
 
 
 def Ping(host):
