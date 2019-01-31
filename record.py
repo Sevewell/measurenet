@@ -45,12 +45,11 @@ def Parse(text):
 def Plot(host):
 
     files = os.listdir('./data/{}'.format(host))
+    files.sort()
     data = []
     for filename in files:
         with open('./data/{}/{}'.format(host, filename), 'r') as f:
             data += [line.strip().split() for line in f]
-
-    print(data)
 
     timeseries = [datetime.strptime(row[0], '%Y%m%d%H%M%S') for row in data]
     Mbps = [float(row[1]) for row in data]
