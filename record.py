@@ -2,6 +2,8 @@ import json
 import subprocess
 from datetime import datetime
 import os
+import matplotlib
+matplotlib.use('Agg')
 from matplotlib import pyplot
 from matplotlib import dates
 
@@ -48,19 +50,18 @@ def Plot(host):
         with open('./data/{}/{}'.format(host, filename), 'r') as f:
             data += [line.strip().split() for line in f]
 
+    print(data)
+
     timeseries = [datetime.strptime(row[0], '%Y%m%d%H%M%S') for row in data]
     Mbps = [float(row[1]) for row in data]
 
     fig = pyplot.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(timeseries, Mbps)
-    # ax.xaxis.set_major_locator(dates.DayLocator())
-    # ax.xaxis.set_major_formatter(dates.DateFormatter('%H'))
     if not os.path.isdir('png'):
         os.makedirs('png')
     fig.savefig('png/{}.png'.format(host))
-    pyplot.close()
-
+    fig.clf()
 
 with open('host.conf', 'r') as f:
     hosts = [host.strip() for host in f]
@@ -79,3 +80,5 @@ for host in hosts:
         f.write('{} {}\n'.format(now, Mbps))
 
     Plot(host)
+
+    pyplot.close()
