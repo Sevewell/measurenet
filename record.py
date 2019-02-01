@@ -1,27 +1,24 @@
+from matplotlib import dates
+from matplotlib import pyplot
 import json
 import subprocess
 from datetime import datetime
 import os
 import matplotlib
 matplotlib.use('Agg')
-from matplotlib import pyplot
-from matplotlib import dates
+import random
 
 os.chdir('measurenet')
 
-conf_ping_json = open('./ping.json', 'r')
-conf_ping = json.load(conf_ping_json)
-conf_ping_json.close()
 
-
-def Ping(host):
+def Ping(target):
 
     command = [
         'ping',
-        '-s', str(conf_ping['size']),
-        '-c', str(conf_ping['count']),
-        '-i', str(conf_ping['interval']),
-        host
+        '-s', str(target['size']),
+        '-c', str(target['count']),
+        '-i', str(target['interval']),
+        target['host']
     ]
 
     process = subprocess.run(command, stdout=subprocess.PIPE)
@@ -31,11 +28,11 @@ def Ping(host):
     return text
 
 
-def Parse(text):
+def Parse(text, size):
 
     # 100%パケットロスだったらNoneを返す
     avg = [line for line in text.split('\n')][-2].split(' ')[-2].split('/')[1]
-    bit = conf_ping['size'] * 8 * 2
+    bit = size * 8 * 2
     bps = bit / (float(avg) / 1000)
     Mbps = bps / 1000 / 1000
 
@@ -57,27 +54,28 @@ def Plot(host):
     fig = pyplot.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(timeseries, Mbps)
+
     if not os.path.isdir('png'):
         os.makedirs('png')
     fig.savefig('png/{}.png'.format(host))
+
     fig.clf()
 
-with open('host.conf', 'r') as f:
-    hosts = [host.strip() for host in f]
 
-for host in hosts:
+with open('./ping.json', 'r') as f:
+    conf_ping = json.load(f)
 
-    text = Ping(host)
-    Mbps = Parse(text)
+for target in conf_ping.values():
 
-    if not os.path.isdir('data/' + host):
-        os.makedirs('data/' + host)
+    if target['size'] == None:
+        target['size'] = random.randint(1, 50) * 1024
+    text = Ping(target)
+    Mbps = Parse(text, target['size'])
+
+    if not os.path.isdir('data/' + target['host']):
+        os.makedirs('data/' + target['host'])
 
     now = datetime.now().strftime('%Y%m%d%H%M%S')
 
-    with open('data/{}/{}.log'.format(host, now[:8]), 'a') as f:
-        f.write('{} {}\n'.format(now, Mbps))
-
-    Plot(host)
-
-    pyplot.close()
+    with open('data/{}/{}.log'.format(target['host'], now[:8]), 'a') as f:
+        f.write('{},{},{}\n'.format(now, target['size'], Mbps))

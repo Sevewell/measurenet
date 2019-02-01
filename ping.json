@@ -1,5 +1,14 @@
 {
-    "size": 51200,
-    "count": 3,
-    "interval": 10
+    "router": {
+        "host": "10.254.30.254",
+        "size": null,
+        "count": 5,
+        "interval": 5
+    },
+    "internet1": {
+        "host": "yahoo.co.jp",
+        "size": 51200,
+        "count": 5,
+        "interval": 5
+    }
 }
