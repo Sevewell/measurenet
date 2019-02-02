@@ -68,7 +68,7 @@ with open('./ping.json', 'r') as f:
 for target in conf_ping.values():
 
     if target['size'] == None:
-        target['size'] = random.randint(1, 50) * 1024
+        target['size'] = random.randint(1, 60) * 1024
     text = Ping(target)
     Mbps = Parse(text, target['size'])
 
