@@ -46,10 +46,10 @@ def Plot(host):
     data = []
     for filename in files:
         with open('./data/{}/{}'.format(host, filename), 'r') as f:
-            data += [line.strip().split() for line in f]
+            data += [line.strip().split(',') for line in f]
 
     timeseries = [datetime.strptime(row[0], '%Y%m%d%H%M%S') for row in data]
-    Mbps = [float(row[1]) for row in data]
+    Mbps = [float(row[2]) for row in data]
 
     fig = pyplot.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -79,3 +79,5 @@ for target in conf_ping.values():
 
     with open('data/{}/{}.log'.format(target['host'], now[:8]), 'a') as f:
         f.write('{},{},{}\n'.format(now, target['size'], Mbps))
+
+    Plot(target['host'])
