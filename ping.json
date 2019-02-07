@@ -10,5 +10,11 @@
         "size": 51200,
         "count": 5,
         "interval": 5
+    },
+    "internet2": {
+        "host": "amazon.co.jp",
+        "size": null,
+        "count": 5,
+        "interval": 5
     }
 }
