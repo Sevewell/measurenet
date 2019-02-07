@@ -1,11 +1,7 @@
-from matplotlib import dates
-from matplotlib import pyplot
-import json
-import subprocess
-from datetime import datetime
 import os
-import matplotlib
-matplotlib.use('Agg')
+from datetime import datetime
+import subprocess
+import json
 import random
 
 os.chdir('measurenet')
@@ -39,29 +35,6 @@ def Parse(text, size):
     return Mbps
 
 
-def Plot(host):
-
-    files = os.listdir('./data/{}'.format(host))
-    files.sort()
-    data = []
-    for filename in files:
-        with open('./data/{}/{}'.format(host, filename), 'r') as f:
-            data += [line.strip().split(',') for line in f]
-
-    timeseries = [datetime.strptime(row[0], '%Y%m%d%H%M%S') for row in data]
-    Mbps = [float(row[2]) for row in data]
-
-    fig = pyplot.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.plot(timeseries, Mbps)
-
-    if not os.path.isdir('png'):
-        os.makedirs('png')
-    fig.savefig('png/{}.png'.format(host))
-
-    fig.clf()
-
-
 with open('./ping.json', 'r') as f:
     conf_ping = json.load(f)
 
@@ -79,5 +52,3 @@ for target in conf_ping.values():
 
     with open('data/{}/{}.log'.format(target['host'], now[:8]), 'a') as f:
         f.write('{},{},{}\n'.format(now, target['size'], Mbps))
-
-    Plot(target['host'])
