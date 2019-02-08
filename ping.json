@@ -7,7 +7,7 @@
     },
     "internet1": {
         "host": "www.yahoo.co.jp",
-        "size": 51200,
+        "size": null,
         "count": 5,
         "interval": 5
     },
