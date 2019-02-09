@@ -5,25 +5,25 @@
         "count": 5,
         "interval": 5
     },
-    "internet1": {
+    "yahoo": {
         "host": "www.yahoo.co.jp",
-        "size": null,
+        "size": 51200,
         "count": 5,
         "interval": 5
     },
-    "internet2": {
+    "amazon": {
         "host": "www.amazon.co.jp",
-        "size": null,
+        "size": 51200,
         "count": 5,
         "interval": 5
     },
-    "internet3": {
+    "microsoft": {
         "host": "www.microsoft.com",
         "size": null,
         "count": 5,
         "interval": 5
     },
-    "internet4": {
+    "apple": {
         "host": "www.apple.com",
         "size": null,
         "count": 5,
