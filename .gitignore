@@ -2,3 +2,4 @@ host.conf
 data
 png
 __pycache__
+env
