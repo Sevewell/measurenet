@@ -4,10 +4,10 @@ from datetime import datetime
 import os
 
 
-def Calc(size, avg):
+def Calc(size, rtt):
 
     bit = size * 8 * 2
-    bps = bit / (avg / 1000)
+    bps = bit / (rtt / 1000)
     Mbps = bps / 1000 / 1000
 
     return Mbps
@@ -24,9 +24,17 @@ def Get(host):
 
     timeseries = [datetime.strptime(row[0], '%Y%m%d%H%M%S') for row in data]
     size = [int(row[1]) for row in data]
-    Mbps = [Calc(int(row[1]), float(row[2])) for row in data]
+    rtt = [float(row[2]) for row in data]
+    Mbps = [Calc(s, t) for s, t in zip(size, rtt)]
 
-    return timeseries, size, Mbps
+    result = {
+        'time': timeseries,
+        'size': size,
+        'rtt': rtt,
+        'mbps': Mbps
+    }
+
+    return result
 
 
 def Estimate(mbps, size, time):
