@@ -29,10 +29,16 @@ def Parse(text, size):
 
     # 100%パケットロスだったらNoneを返す
 
-    packet_loss = [line for line in text.split('\n')][-3].split(', ')[-2]
-    avg = [line for line in text.split('\n')][-2].split(' ')[-2].split('/')[1]
+    packet_loss = [line for line in text.split('\n')][-3].split(', ')[-2].split(' ')[0]
+    rtt = [line for line in text.split('\n')][-2].split(' ')[-2].split('/')
 
-    return packet_loss, avg
+    parsed = {
+        'packet_loss':packet_loss,
+        'rtt_avg':rtt[1],
+        'rtt_dev':rtt[3]
+    }
+
+    return parsed
 
 
 with open('./ping.json', 'r') as f:
@@ -48,7 +54,7 @@ config = {
 if config['size'] == None:
     config['size'] = random.randint(1, 60) * 1024
 text = Ping(config)
-packet_loss, rtt_avg = Parse(text, config['size'])
+info = Parse(text, config['size'])
 
 if not os.path.isdir('data/' + config['host']):
     os.makedirs('data/' + config['host'])
@@ -56,4 +62,4 @@ if not os.path.isdir('data/' + config['host']):
 now = datetime.now().strftime('%Y%m%d%H%M%S')
 
 with open('data/{}/{}.csv'.format(config['host'], now[:8]), 'a') as f:
-    f.write('{},{},{},{}\n'.format(now, config['size'], packet_loss, rtt_avg))
+    f.write('{},{},{},{},{}\n'.format(now, config['size'], info['packet_loss'], info['rtt_avg'], info['rtt_dev']))
