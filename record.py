@@ -28,25 +28,32 @@ def Ping(target):
 def Parse(text, size):
 
     # 100%パケットロスだったらNoneを返す
+
+    packet_loss = [line for line in text.split('\n')][-3].split(', ')[-2]
     avg = [line for line in text.split('\n')][-2].split(' ')[-2].split('/')[1]
 
-    return avg
+    return packet_loss, avg
 
 
 with open('./ping.json', 'r') as f:
     conf_ping = json.load(f)
 
-for target in conf_ping.values():
+config = {
+    'host':'www.amazon.co.jp',
+    'size':None,
+    'count':10,
+    'interval':60
+}
 
-    if target['size'] == None:
-        target['size'] = random.randint(1, 60) * 1024
-    text = Ping(target)
-    time_avg = Parse(text, target['size'])
+if config['size'] == None:
+    config['size'] = random.randint(1, 60) * 1024
+text = Ping(config)
+packet_loss, rtt_avg = Parse(text, config['size'])
 
-    if not os.path.isdir('data/' + target['host']):
-        os.makedirs('data/' + target['host'])
+if not os.path.isdir('data/' + config['host']):
+    os.makedirs('data/' + config['host'])
 
-    now = datetime.now().strftime('%Y%m%d%H%M%S')
+now = datetime.now().strftime('%Y%m%d%H%M%S')
 
-    with open('data/{}/{}.log'.format(target['host'], now[:8]), 'a') as f:
-        f.write('{},{},{}\n'.format(now, target['size'], time_avg))
+with open('data/{}/{}.csv'.format(config['host'], now[:8]), 'a') as f:
+    f.write('{},{},{},{}\n'.format(now, config['size'], packet_loss, rtt_avg))
