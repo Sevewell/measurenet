@@ -13,7 +13,6 @@ def Ping(target):
         'ping',
         '-s', str(target['size']),
         '-c', str(target['count']),
-        '-i', str(target['interval']),
         target['host']
     ]
 
@@ -25,20 +24,15 @@ def Ping(target):
     return text
 
 
-def Parse(text, size):
+def Parse(text):
 
     # 100%パケットロスだったらNoneを返す
+    if '100% packet loss' in text:
+        return None
 
-    packet_loss = [line for line in text.split('\n')][-3].split(', ')[-2].split(' ')[0]
-    rtt = [line for line in text.split('\n')][-2].split(' ')[-2].split('/')
+    rtt = [line for line in text.split('\n')][-2].split(' ')[-2].split('/')[1]
 
-    parsed = {
-        'packet_loss':packet_loss,
-        'rtt_avg':rtt[1],
-        'rtt_dev':rtt[3]
-    }
-
-    return parsed
+    return rtt
 
 
 with open('./ping.json', 'r') as f:
@@ -47,14 +41,13 @@ with open('./ping.json', 'r') as f:
 config = {
     'host':'www.amazon.co.jp',
     'size':None,
-    'count':10,
-    'interval':60
+    'count':1
 }
 
 if config['size'] == None:
     config['size'] = random.randint(1, 60) * 1024
 text = Ping(config)
-info = Parse(text, config['size'])
+rtt = Parse(text)
 
 if not os.path.isdir('data/' + config['host']):
     os.makedirs('data/' + config['host'])
@@ -62,4 +55,4 @@ if not os.path.isdir('data/' + config['host']):
 now = datetime.now().strftime('%Y%m%d%H%M%S')
 
 with open('data/{}/{}.csv'.format(config['host'], now[:8]), 'a') as f:
-    f.write('{},{},{},{},{}\n'.format(now, config['size'], info['packet_loss'], info['rtt_avg'], info['rtt_dev']))
+    f.write('{},{},{}\n'.format(now, config['size'], rtt))
