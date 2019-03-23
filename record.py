@@ -45,7 +45,7 @@ config = {
 }
 
 if config['size'] == None:
-    config['size'] = random.randint(1, 60) * 1024
+    config['size'] = random.randint(1, 20) * 1024
 text = Ping(config)
 rtt = Parse(text)
 
