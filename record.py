@@ -48,7 +48,7 @@ def Record(host, size, rtt):
 
 
 host = 'www.amazon.co.jp'
-size = Size(30)
+size = int(random.uniform(1, 10) * 1024)
 
 text = Ping(host, size)
 rtt = Parse(text)
