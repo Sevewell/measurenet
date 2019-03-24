@@ -6,9 +6,9 @@ import random
 os.chdir('measurenet')
 
 
-def Ping(host, size_kb):
+def Ping(host, size):
 
-    command = ['ping', '-s', str(int(size_kb * 1024)), '-c', '1', host]
+    command = ['ping', '-s', str(size), '-c', '1', host]
 
     process = subprocess.run(command, stdout=subprocess.PIPE)
     text = process.stdout.decode('UTF-8')
@@ -30,11 +30,11 @@ def Parse(text):
 
 def Size(size_max):
 
-    size_kb = size_max
-    while size_kb >= size_max:
-        size_kb = random.expovariate(0.5)
+    size = size_max
+    while size >= size_max:
+        size = random.expovariate(0.5)
     
-    return size_kb
+    return int(size * 1024)
 
 
 def Record(host, size, rtt):
