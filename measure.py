@@ -23,9 +23,9 @@ def Get(host):
             data += [line.strip().split(',') for line in f]
 
     timeseries = [datetime.strptime(row[0], '%Y%m%d%H%M%S') for row in data]
-    size = [int(row[1]) for row in data]
-    rtt = [float(row[2]) for row in data]
-    Mbps = [Calc(s, t) for s, t in zip(size, rtt)]
+    size = [float(row[1]) for row in data]
+    rtt = [float(row[2]) if row[2] != 'None' else None for row in data]
+    Mbps = [Calc(s, t) if t != None else None for s, t in zip(size, rtt)]
 
     result = {
         'time': timeseries,

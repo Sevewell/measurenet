@@ -8,17 +8,22 @@ from matplotlib import pyplot
 from matplotlib import dates
 
 
-def Plot(timeseries, mbps):
+def PlotRTT(ax, timeseries, value):
 
-    fig = pyplot.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.plot(timeseries, mbps)
+    ax.plot(timeseries, value)
+    ax.set_ylim([0, 50])
+    ax.set_xlabel('Date')
+    ax.set_ylabel('RTT')
+    ax.xaxis.set_major_formatter(dates.DateFormatter('%m%d'))
+
+
+def PlotMbps(ax, timeseries, value):
+
+    ax.plot(timeseries, value)
+    #ax.set_ylim([0, 50])
+    ax.set_xlabel('Date')
     ax.set_ylabel('Mbps')
-    ax.xaxis.set_major_formatter(dates.DateFormatter('%m/%d'))
-
-    fig.savefig('plot.png')
-
-    fig.clf()
+    ax.xaxis.set_major_formatter(dates.DateFormatter('%m%d'))
 
 
 def Hist(name, value):
@@ -32,34 +37,35 @@ def Hist(name, value):
     fig.clf()
 
 
-def ScatterRTT(size, rtt):
+def ScatterRTT(ax, size, rtt):
 
     size_k = [s / 1024 for s in size]
 
-    fig = pyplot.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.scatter(size_k, rtt)
+    ax.scatter(size_k, rtt, s=1, alpha=0.5)
+    ax.set_xlim([0, 11])
+    ax.set_ylim([0, 30])
     ax.set_xlabel('size(kb)')
-    ax.set_ylabel('rtt')
-
-    fig.savefig('scatter_rtt.png')
-
-    fig.clf()
+    ax.set_ylabel('RTT')
 
 
-def ScatterMbps(size, mbps):
+def ScatterMbps(ax, size, Mbps):
 
     size_k = [s / 1024 for s in size]
 
-    fig = pyplot.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.scatter(size_k, mbps)
+    ax.scatter(size_k, Mbps, s=1, alpha=0.5)
+    ax.set_xlim([0, 11])
+    ax.set_ylim([0, 25])
     ax.set_xlabel('size(kb)')
     ax.set_ylabel('Mbps')
 
-    fig.savefig('scatter_mbps.png')
 
-    fig.clf()
+def HistMissing(ax, data):
+
+    size_value = [s for r,s in zip(data['rtt'], data['size']) if r != None]
+    size_missing = [s for r,s in zip(data['rtt'], data['size']) if r == None]
+
+    ax.hist(size_value, range=(0, 15000), bins=25, alpha=0.5, density=True)
+    ax.hist(size_missing, range=(0, 15000), bins=25, alpha=0.5, density=True)
 
 
 if __name__ == "__main__":
@@ -72,8 +78,15 @@ if __name__ == "__main__":
         os.makedirs(directory)
     os.chdir(directory)
 
-    Plot(data['time'], data['mbps'])
-    Hist('Mbps', data['mbps'])
-    Hist('rtt', data['rtt'])
-    ScatterRTT(data['size'], data['rtt'])
-    ScatterMbps(data['size'], data['mbps'])
+    fig = pyplot.figure(figsize=(16,9))
+
+    PlotRTT(fig.add_subplot(2,2,1), data['time'], data['rtt'])
+    ScatterRTT(fig.add_subplot(2,2,2), data['size'], data['rtt'])
+    PlotMbps(fig.add_subplot(2,2,3), data['time'], data['mbps'])
+    ScatterMbps(fig.add_subplot(2,2,4), data['size'], data['mbps'])
+
+    fig.savefig('Dashboard.png')
+
+    fig = pyplot.figure()
+    HistMissing(fig.add_subplot(1,1,1), data)
+    fig.savefig('Missing.png')
