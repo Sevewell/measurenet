@@ -10,8 +10,12 @@ matplotlib.use('Agg')
 
 def PlotRTT(ax, timeseries, value):
 
+    timeseries_None = [t for t,v in zip(timeseries, value) if v == None]
+    hight_None = [0 for i in range(len(timeseries_None))]
+
     ax.plot(timeseries, value)
-    ax.set_ylim([0, 50])
+    ax.scatter(timeseries_None, hight_None, marker='x', color='r')
+    ax.set_ylim([-5, 30])
     ax.set_xlabel('Date')
     ax.set_ylabel('RTT')
     ax.xaxis.set_major_formatter(dates.DateFormatter('%m%d\n%H'))
@@ -20,7 +24,7 @@ def PlotRTT(ax, timeseries, value):
 def PlotMbps(ax, timeseries, value):
 
     ax.plot(timeseries, value)
-    #ax.set_ylim([0, 50])
+    ax.set_ylim([0, 25])
     ax.set_xlabel('Date')
     ax.set_ylabel('Mbps')
     ax.xaxis.set_major_formatter(dates.DateFormatter('%m%d\n%H'))
@@ -43,7 +47,7 @@ def ScatterRTT(ax, size, rtt):
 
     ax.scatter(size_k, rtt, s=1, alpha=0.5)
     ax.set_xlim([0, 11])
-    ax.set_ylim([0, 30])
+    ax.set_ylim([0, 20])
     ax.set_xlabel('size(kb)')
     ax.set_ylabel('RTT')
 
