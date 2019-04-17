@@ -1,6 +1,6 @@
 import random
 import math
-from datetime import datetime
+import datetime
 import os
 
 
@@ -13,7 +13,21 @@ def Calc(size, rtt):
     return Mbps
 
 
-def Get(host):
+def SliceDataByTerm(data, term):
+
+    now = datetime.datetime.now()
+    start = now - datetime.timedelta(days=term)
+
+    index = None
+    for i, row in enumerate(data):
+        if row[0] > start:
+            index = i
+            break
+
+    return data[index:]
+
+
+def Get(host, term):
 
     files = os.listdir('./data/{}'.format(host))
     files.sort()
@@ -22,7 +36,13 @@ def Get(host):
         with open('./data/{}/{}'.format(host, filename), 'r') as f:
             data += [line.strip().split(',') for line in f]
 
-    timeseries = [datetime.strptime(row[0], '%Y%m%d%H%M%S') for row in data]
+    for row in data:
+        row[0] = datetime.datetime.strptime(row[0], '%Y%m%d%H%M%S')
+
+    # 欲しい期間に絞る
+    data = SliceDataByTerm(data, term)
+
+    timeseries = [row[0] for row in data]
     size = [float(row[1]) for row in data]
     rtt = [float(row[2]) if row[2] != 'None' else None for row in data]
     Mbps = [Calc(s, t) if t != None else None for s, t in zip(size, rtt)]
