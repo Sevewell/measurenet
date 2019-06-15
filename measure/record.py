@@ -1,10 +1,9 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import subprocess
 import random
-
-os.chdir('measurenet')
-
+import sched
+import time
 
 def Ping(host, size):
 
@@ -39,19 +38,28 @@ def Size(size_max):
 
 def Record(host, size, rtt):
 
-    now = datetime.now().strftime('%Y%m%d%H%M%S')
+    jst = timezone(timedelta(hours=+9), 'JST')
+    now = datetime.now(jst).isoformat()
 
     if not os.path.isdir('data/' + host):
         os.makedirs('data/' + host)
-    with open('data/{}/{}.csv'.format(host, now[:8]), 'a') as f:
+    with open('data/{}/{}.csv'.format(host, now.split('T')[0]), 'a') as f:
         f.write('{},{},{}\n'.format(now, size, rtt))
+
+def Main():
+
+    global host
+    global size
+    text = Ping(host, size)
+    rtt = Parse(text)
+    Record(host, size, rtt)
 
 
 host = 'www.amazon.co.jp'
 size = int(random.uniform(1, 10) * 1024)
 
-text = Ping(host, size)
-rtt = Parse(text)
+s = sched.scheduler(time.time, time.sleep)
 
-Record(host, size, rtt)
-
+while True:
+    s.enter(60, 1, Main)
+    s.run()

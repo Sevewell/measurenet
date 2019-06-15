@@ -37,10 +37,10 @@ def Get(host, term):
             data += [line.strip().split(',') for line in f]
 
     for row in data:
-        row[0] = datetime.datetime.strptime(row[0], '%Y%m%d%H%M%S')
+        row[0] = datetime.datetime.fromisoformat(row[0])
 
     # 欲しい期間に絞る
-    data = SliceDataByTerm(data, term)
+    #data = SliceDataByTerm(data, term)
 
     timeseries = [row[0] for row in data]
     size = [float(row[1]) for row in data]

@@ -1,0 +1,13 @@
+version: '3'
+services:
+  measure:
+    build: ./measure/
+    volumes:
+      - ./data:/usr/local/measure/data
+  web:
+    build: ./web/
+    ports:
+      - 80:8000
+    volumes:
+      - ./web/app:/usr/local/dash/app
+      - ./data:/usr/local/dash/data
