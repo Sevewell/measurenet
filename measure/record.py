@@ -38,8 +38,8 @@ def Size(size_max):
 
 def Record(host, size, rtt):
 
-    jst = timezone(timedelta(hours=+9), 'JST')
-    now = datetime.now(jst).isoformat()
+    #jst = timezone(timedelta(hours=+9), 'JST')
+    now = datetime.now().isoformat()
 
     if not os.path.isdir('data/' + host):
         os.makedirs('data/' + host)
@@ -56,10 +56,10 @@ def Main():
 
 
 host = 'www.amazon.co.jp'
-size = int(random.uniform(1, 10) * 1024)
 
 s = sched.scheduler(time.time, time.sleep)
 
 while True:
+    size = int(random.uniform(1, 10) * 1024)
     s.enter(60, 1, Main)
     s.run()

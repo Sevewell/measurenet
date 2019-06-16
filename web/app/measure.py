@@ -15,8 +15,7 @@ def Calc(size, rtt):
 
 def SliceDataByTerm(data, term):
 
-    now = datetime.datetime.now()
-    start = now - datetime.timedelta(days=term)
+    start = datetime.datetime.now() - datetime.timedelta(hours=term)
 
     index = None
     for i, row in enumerate(data):
@@ -40,7 +39,7 @@ def Get(host, term):
         row[0] = datetime.datetime.fromisoformat(row[0])
 
     # 欲しい期間に絞る
-    #data = SliceDataByTerm(data, term)
+    data = SliceDataByTerm(data, term)
 
     timeseries = [row[0] for row in data]
     size = [float(row[1]) for row in data]
