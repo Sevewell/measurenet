@@ -4,6 +4,7 @@ import subprocess
 import random
 import sched
 import time
+import csv
 
 def Ping(host, size):
 
@@ -41,10 +42,24 @@ def Record(host, size, rtt):
     #jst = timezone(timedelta(hours=+9), 'JST')
     now = datetime.now().isoformat()
 
-    if not os.path.isdir('data/' + host):
+    directory = 'data/{}/{}.csv'.format(host, now.split('T')[0])
+
+    if not os.path.exists('./data/{}'.format(host)):
         os.makedirs('data/' + host)
-    with open('data/{}/{}.csv'.format(host, now.split('T')[0]), 'a') as f:
-        f.write('{},{},{}\n'.format(now, size, rtt))
+
+    if not os.path.exists(directory):
+        rows = [
+            ['datetime','size','rtt'],
+            [now, size, rtt]
+        ]
+    else:
+        rows = [
+            [now, size, rtt]
+        ]
+
+    with open(directory, mode='a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(rows)
 
 def Main():
 

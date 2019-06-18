@@ -1,19 +1,45 @@
 #!/usr/lib/python3
 
-import measure
+import os
+import datetime
+import pandas
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from datetime import timedelta
+
+def CalcMbps(data):
+
+    bit = data['size'] * 8 * 2
+    bps = bit / (data['rtt'] / 1000)
+    mbps = bps / 1000 / 1000
+
+    return mbps
+
+def Load(host, term):
+
+    files = os.listdir('./data/{}'.format(host))
+    datas = [pandas.read_csv('./data/{}/{}'.format(host, f)) for f in files]
+    data = pandas.concat(datas)
+
+    data['datetime'] = [datetime.datetime.fromisoformat(d) for d in data['datetime']]
+
+    # 欲しい期間に絞る
+    start_datetime = datetime.datetime.now() - datetime.timedelta(hours=term)
+    data = data[data['datetime'] > start_datetime]
+
+    data['mbps'] = CalcMbps(data)
+
+    return data
 
 app = dash.Dash(__name__)
 
 host = 'www.amazon.co.jp'
-term_hours = 1
+directory = './data/{}'
+term_hours = 3
 
 def serve_layout():
 
-    data = measure.Get(host, term_hours)
+    data = Load(host, term_hours)
 
     return html.Div(children=[
 
@@ -24,8 +50,8 @@ def serve_layout():
             figure={
                 'data': [
                     {
-                        'x': [d + timedelta(hours=9) for d in data['time']],
-                        'y':data['mbps'],
+                        'x': data['datetime'] + datetime.timedelta(hours=9),
+                        'y': data['mbps'],
                         'type': 'scatter',
                         'name': 'mbps',
                     }
@@ -66,14 +92,14 @@ def serve_layout():
             figure={
                 'data': [
                     {
-                        'x': [s / 1024 for s in data['size']],
+                        'x': data['size'] / 1024,
                         'y': data['rtt'],
                         'type': 'scatter',
                         'mode': 'markers'
                     }
                 ],
                 'layout': {
-                    'title': '送信サイズ（KB）とRTTの関係',
+                    'title': '送信サイズとRTTの関係',
                     'yaxis': {
                         'range': [0, 20]
                     }
