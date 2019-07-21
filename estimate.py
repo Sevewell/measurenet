@@ -1,26 +1,21 @@
-import measure
-import sys
-from scipy import stats
+import tensorflow as tf
+import tensorflow_probability as tfp
 
-class Intercept:
+print('Import successed.')
 
-    def __init__(self, param, dist_prior):
+# Pretend to load synthetic data set.
+features = tfp.distributions.Normal(loc=0., scale=1.).sample(int(100e3))
+labels = tfp.distributions.Bernoulli(logits=1.618 * features).sample()
 
-        self.param = param
-        self.dist_prior = dist_prior
+# Specify model.
+model = tfp.glm.Bernoulli()
 
-    def Likelihood(hypothesis=False):
+# Fit model given data.
+coeffs, linear_response, is_converged, num_iter = tfp.glm.fit(
+    model_matrix=features[:, tf.newaxis],
+    response=tf.cast(labels, dtype=tf.float32),
+    model=model)
+# ==> coeffs is approximately [1.618] (We're golden!)
 
-        if hypothesis:
-            param = self.dist_prior.rvs()
-        else:
-            param = self.param
-
-        return self.dist_prior.pdf(param)
-
-
-def GetParameterLinear(intercept, coefficient, sample):
-
-
-
-host = sys.argv[1]
+print(coeffs)
+print(linear_response)

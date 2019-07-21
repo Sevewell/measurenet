@@ -70,11 +70,11 @@ def Main():
     Record(host, size, rtt)
 
 
-host = 'www.amazon.co.jp'
+host = '10.254.30.254'
 
 s = sched.scheduler(time.time, time.sleep)
 
 while True:
-    size = int(random.uniform(1, 10) * 1024)
+    size = int(random.uniform(1, 60) * 1024)
     s.enter(60, 1, Main)
     s.run()

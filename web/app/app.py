@@ -33,7 +33,7 @@ def Load(host, term):
 
 app = dash.Dash(__name__)
 
-host = 'www.amazon.co.jp'
+host = '10.254.30.254'
 directory = './data/{}'
 term_hours = 3
 
@@ -41,77 +41,73 @@ def serve_layout():
 
     data = Load(host, term_hours)
 
-    return html.Div(children=[
-
-        html.H1(children='Measurement Speed Internet'),
-        html.Div(children='自宅インターネット回線の速度を測ります。'),
-        dcc.Graph(
-            id='example-graph',
-            figure={
-                'data': [
-                    {
-                        'x': data['datetime'] + datetime.timedelta(hours=9),
-                        'y': data['mbps'],
-                        'type': 'scatter',
-                        'name': 'mbps',
-                    }
-                ],
-                'layout': {
-                    'title': 'Mbpsの推移'
-                }
-            }
-        ),
-        dcc.Graph(
-            id='histgram-rtt',
-            figure={
-                'data': [
-                    {
-                        'x': data['rtt'],
-                        'type': 'histogram',
-                        'xbins': {
-                            'start': 0,
-                            'end': 20,
-                            'size': 1
+    return html.Div(
+        children=[
+            html.H1(children='Measurement Speed Internet'),
+            html.Div(children='自宅インターネット回線の速度を測ります。'),
+            dcc.Graph(
+                id='example-graph',
+                figure={
+                    'data': [
+                        {
+                            'x': data['datetime'] + datetime.timedelta(hours=9),
+                            'y': data['mbps'],
+                            'type': 'scatter',
+                            'name': 'mbps',
                         }
+                    ],
+                    'layout': {
+                        'title': 'Mbpsの推移'
                     }
-                ],
-                'layout': {
-                    'title': 'RTT',
-                    'xaxis': {
-                        'range': [5, 20]
-                    }
+                },
+                style={
+                    #'margin': '2%'
                 }
-            },
-            style={
-                'float': 'left',
-                'width': '50%'
-            }
-        ),
-        dcc.Graph(
-            id='scatter-size-and-rtt',
-            figure={
-                'data': [
-                    {
-                        'x': data['size'] / 1024,
-                        'y': data['rtt'],
-                        'type': 'scatter',
-                        'mode': 'markers'
+            ),
+            dcc.Graph(
+                id='histgram-rtt',
+                figure={
+                    'data': [
+                        {
+                            'x': data['rtt'],
+                            'type': 'histogram',
+                        }
+                    ],
+                    'layout': {
+                        'title': 'RTT',
                     }
-                ],
-                'layout': {
-                    'title': '送信サイズとRTTの関係',
-                    'yaxis': {
-                        'range': [0, 20]
-                    }
+                },
+                style={
+                    'float': 'left',
+                    'width': '50%',
                 }
-            },
-            style={
-                'float': 'right',
-                'width': '50%'
-            }
-        )
-
-    ])
+            ),
+            dcc.Graph(
+                id='scatter-size-and-rtt',
+                figure={
+                    'data': [
+                        {
+                            'x': data['size'] / 1024,
+                            'y': data['rtt'],
+                            'type': 'scatter',
+                            'mode': 'markers'
+                        }
+                    ],
+                    'layout': {
+                        'title': '送信サイズとRTTの関係',
+                    }
+                },
+                style={
+                    'float': 'right',
+                    'width': '50%',
+                }
+            )
+        ],
+        style={
+            'height':'100vh',
+            'background-color':'whitesmoke'
+        }
+    )
 
 app.layout = serve_layout
 
